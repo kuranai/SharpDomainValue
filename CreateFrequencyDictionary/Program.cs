@@ -1,4 +1,7 @@
-﻿//create a word frequency dictionary
+﻿//Source: https://github.com/wolfgarbe/SymSpell/issues/15
+//create a word frequency dictionary
+
+using System.Text;
 
 void CreateWordFrequencyDictionary()
 {
@@ -10,9 +13,8 @@ void CreateWordFrequencyDictionary()
     var hs = new HashSet<string>();
     using (var sr = new StreamReader(@"scowl2.txt"))
     {
-        string? line;
         //process a single line at a time only for memory efficiency
-        while ((line = sr.ReadLine()) != null)
+        while (sr.ReadLine() is { } line)
         {
             if (line.Length < 1) continue;
             if (char.IsUpper(line.Last())) continue; //do not allow abbreviations
@@ -32,52 +34,50 @@ void CreateWordFrequencyDictionary()
         while (sr.ReadLine() is { } line)
         {
             var lineParts = line.Split('\t');
-            if (lineParts.Length >= 3)
+            if (lineParts.Length < 3) continue;
+            var key = lineParts[0].ToLower();
+
+            //allow only terms from the google n-grams which are also in the SCOWL lis
+            if (!hs.Contains(key)) continue;
+
+            //allow only terms which start with a letter
+            if (!char.IsLetter(key.First())) continue;
+
+
+            //only a & i are genuine single letter english words
+            if (key.Length == 1 && key != "a" && key != "i") continue;
+
+            //addition filters
+            if (key.EndsWith(".")) continue;
+            if (key.Length == 2 && (key.StartsWith("'") || key.EndsWith("'"))) continue;
+
+            switch (key)
             {
-                var key = lineParts[0].ToLower();
-
-                //allow only terms from the google n-grams which are also in the SCOWL lis
-                if (!hs.Contains(key)) continue;
-
-                //allow only terms which start with a letter
-                if (!char.IsLetter(key.First())) continue;
-
-
-                //only a & i are genuine single letter english words
-                if (key.Length == 1 && key != "a" && key != "i") continue;
-
-                //addition filters
-                if (key.EndsWith(".")) continue;
-                if (key.Length == 2 && (key.StartsWith("'") || key.EndsWith("'"))) continue;
-
-                switch (key)
-                {
-                    case "ha":
-                    case "te":
-                    case "sp":
-                    case "th":
-                    case "ca":
-                    case "yu":
-                    case "ms":
-                    case "ins":
-                    case "ith":
-                    case "spp":
-                    case "hou":
-                    case "ewith":
-                    case "fori":
-                        continue;
-                }
-
-
-                //set word counts
-                if (!long.TryParse(lineParts[2], out var count)) continue;
-                //add to dictionary
-                if (termlist.ContainsKey(key))
-                    termlist[key] += count;
-                else
-                    termlist[key] = count;
-                //Console.WriteLine(key+" "+count.ToString("N0"));
+                case "ha":
+                case "te":
+                case "sp":
+                case "th":
+                case "ca":
+                case "yu":
+                case "ms":
+                case "ins":
+                case "ith":
+                case "spp":
+                case "hou":
+                case "ewith":
+                case "fori":
+                    continue;
             }
+
+
+            //set word counts
+            if (!long.TryParse(lineParts[2], out var count)) continue;
+            //add to dictionary
+            if (termlist.ContainsKey(key))
+                termlist[key] += count;
+            else
+                termlist[key] = count;
+            //Console.WriteLine(key+" "+count.ToString("N0"));
         }
     }
 
