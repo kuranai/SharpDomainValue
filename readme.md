@@ -1,0 +1,3 @@
+Just trying to learn C# and .NET ...
+
+This project should predict the worth of a domain, because I wanted to find some great domains for my projects and need a way to sort the mess.
