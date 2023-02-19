@@ -8,7 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="SymSpell" Version="6.7.2"/>
+        <PackageReference Include="FastText.NetWrapper" Version="1.3.0" />
+        <PackageReference Include="SymSpell" Version="6.7.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="data\lid.176.ftz">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

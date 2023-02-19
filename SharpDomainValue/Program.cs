@@ -1,8 +1,13 @@
-﻿namespace SharpDomainValue;
+﻿using System.Diagnostics;
+using FastText.NetWrapper;
 
-internal class Program
+
+namespace SharpDomainValue;
+
+
+public static class Program
 {
-    private static void Main()
+    public static void Main()
     {
         //set parameters
         const int initialCapacity = 82765;
@@ -15,17 +20,32 @@ internal class Program
         if (!symSpell.LoadDictionary(path, 0, 1))
         {
             Console.Error.WriteLine("\rFile not found: " + Path.GetFullPath(path));
-            return;
         }
 
-        var input = "thisismylittletest";
+        var input = "dasistmeinkleinertest";
         Console.WriteLine(Correct(input, symSpell));
+
+        Console.WriteLine(GetLanguage(input));
+
     }
 
     private static string Correct(string input, SymSpell symSpell)
     {
         //check if input term or similar terms within edit-distance are in dictionary, return results sorted by ascending edit distance, then by descending word frequency     
         return symSpell.WordSegmentation(input).correctedString;
-        
+    }
+
+    private static string GetLanguage(string input)
+    {
+        // Stopwatch stopWatch = new Stopwatch();
+        // stopWatch.Start();
+        var fastText = new FastTextWrapper();
+        fastText.LoadModel("data/lid.176.ftz");
+        var detectedlang = fastText.PredictSingle(input);
+        //remove first 9 characters
+        return detectedlang.Label.Substring(9);
+        // stopWatch.Stop();
+        // TimeSpan ts = stopWatch.Elapsed;
+        // Console.WriteLine(ts.TotalMilliseconds);
     }
 }
